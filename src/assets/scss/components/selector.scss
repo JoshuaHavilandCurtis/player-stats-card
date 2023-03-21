@@ -1,0 +1,51 @@
+.selector {
+	position: relative;
+
+	display: flex;
+	justify-content: flex-start;
+
+	&.visible {
+		.options {
+			opacity: 1;
+		}
+	}
+
+	select {
+		display: none !important;
+	}
+
+	.selected {
+		display: flex;
+		padding: 0.75rem 1.5rem;
+		background-color: white;
+		cursor: pointer;
+	}
+
+	.options {
+		position: absolute;
+		top: 100%;
+
+		display: flex;
+		flex-direction: column;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		background-color: white;
+
+		opacity: 0;
+		transition: opacity 150ms ease-in-out;
+
+		.option {
+			padding: 0.75rem 1.5rem;
+
+			cursor: pointer;
+
+			transition: background-color 75ms ease-in-out;
+
+			&:hover {
+				background-color: whitesmoke;
+			}
+		}
+	}
+}
