@@ -45,7 +45,7 @@ class CustomSelect {
 		this.optionList.transitionDuration = parseFloat(getComputedStyle(this.optionList.elmt).transitionDuration) * 1000;
 
 		//close when clicking off
-		window.addEventListener("click", (ev: MouseEvent) => {
+		window.addEventListener("click", ev => {
 			if (ev.target === this.selectedBox || !this.visible || ev.target === this.container || this.container.contains(ev.target as HTMLElement)) return;
 			this.close();
 		});
