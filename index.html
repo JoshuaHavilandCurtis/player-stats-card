@@ -15,15 +15,36 @@
 
 	<main>
 		<div class="player-card">
-			<div class="player-card__selector selector" data-selector>
-				<select id="temp">
-					<option selected value="player-1">Jeff</option>
-					<option value="player-2">Larry</option>
-					<option value="player-3">Simone</option>
-				</select>
+			<div class="player-card__selector">
+				<div class="selector" data-selector>
+					<select id="temp">
+						<option selected value="player-1">Select a player</option>
+						<option value="player-2">Larry</option>
+						<option value="player-3">Simone</option>
+					</select>
+				</div>
 			</div>
-			<div class="player-card__header"></div>
-			<div class="player-card__details"></div>
+
+			<div class="player-card__header">
+				<img src="dist/img/p2064.png">
+			</div>
+
+			<div class="player-card__details">
+				<div class="player-card__image"></div>
+
+				<div class="player-card-headings">
+					<h1 class="player-card__heading">Toby Alderweireld</h1>
+					<h2 class="player-card__subtitle">Defender</h2>
+				</div>
+
+				<ul class="player-card__table">
+					<li>Appearances <span>80</span></li>
+					<li>Goals <span>5</span></li>
+					<li>Assists <span>2</span></li>
+					<li>Goals per match <span>0.06</span></li>
+					<li>Passes per minute <span>0.26</span></li>
+				</ul>
+			</div>
 		</div>
 	</main>
 
