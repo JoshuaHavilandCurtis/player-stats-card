@@ -24,20 +24,20 @@ const handlePlayerCard = async (entryNode: HTMLElement) => {
 	const loader = new LoaderComponent(entryNode);
 	const playerCardContainer = new PlayerCardContainer(entryNode);
 
-	//render the loader
-	loader.render();
+	//create the loader
+	loader.create();
 
 	//read player data from json
 	const data = await getPlayerData();
 	const players = new Map();
 	for (const player of data.players) players.set(player.player.id, player);
 
-	//un-render the loader
-	loader.unrender();
+	//destroy the loader
+	loader.destroy();
 
-	//render the player card container
+	//create the player card container
 	//the first player is rendered when the page loads: selectboxes will select the first option by default
-	playerCardContainer.render({ playerCardSelector: { players: Array.from(players.values()) } });
+	playerCardContainer.create({ playerCardSelector: { players: Array.from(players.values()) } });
 }
 
 
@@ -63,7 +63,7 @@ class PlayerCardContainer extends Component {
 	playerCardSelector: PlayerCardSelector | null = null;
 	playerCard: PlayerCard | null = null;
 
-	render(props: { playerCardSelector: { players: Player[] } }) {
+	create(props: { playerCardSelector: { players: Player[] } }) {
 		this.replaceHtml(`<div class="player-card-container"></div>`);
 
 		const container = this.node.querySelector<HTMLElement>(".player-card-container");
@@ -71,19 +71,20 @@ class PlayerCardContainer extends Component {
 
 		this.playerCard = new PlayerCard(container);
 		this.playerCardSelector = new PlayerCardSelector(container, this.playerCard);
-		this.playerCardSelector.render(props.playerCardSelector);
+		this.playerCardSelector.create(props.playerCardSelector);
 	}
 
-	unrender() {
-		this.replaceHtml("");
+	destroy() {
+		super.destroy();
+
 		this.playerCardSelector = null;
 		this.playerCard = null;
 	}
 }
 
 /**
- * A custom selectbox that switches the player card that's currently being
- * rendered when the value changes
+ * A custom selectbox that switches the visible player card. Created when the
+ * selectbox value changes
  */
 
 class PlayerCardSelector extends Component {
@@ -94,7 +95,7 @@ class PlayerCardSelector extends Component {
 		super(entryNode);
 	}
 
-	render(props: { players: Player[] }) {
+	create(props: { players: Player[] }) {
 		this.replaceHtml(`
 			<div class="player-card-selector__wrapper">
 				<select class="player-card-selector selector">
@@ -118,7 +119,7 @@ class PlayerCardSelector extends Component {
 			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
 
 			//display this player
-			this.playerCard.render({ player });
+			this.playerCard.create({ player });
 		});
 
 		new CustomSelector(selector);
@@ -130,7 +131,7 @@ class PlayerCardSelector extends Component {
  */
 
 class PlayerCard extends Component {
-	render(props: { player: Player }) {
+	create(props: { player: Player }) {
 		const getStat = (statName: PlayerStatisticName) => props.player.stats.find(stat => stat.name === statName)?.value ?? null;
 
 		//read / calculate stats

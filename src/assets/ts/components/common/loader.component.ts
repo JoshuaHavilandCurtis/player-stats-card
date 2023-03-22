@@ -6,7 +6,7 @@ import Component from "../../lib/component.class";
  */
 
 export class LoaderComponent extends Component {
-	render() {
+	create() {
 		this.replaceHtml(`<div class="loader-container"><div class="loader"></div></div>`);
 	}
 }

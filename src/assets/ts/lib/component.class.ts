@@ -17,9 +17,10 @@ export default abstract class Component {
 		}
 	}
 
-	render(..._params: any) { } //TODO ---> look up how to fix this
+	create(_props: {}) { } //TODO ---> look up how to fix this
 
-	unrender() { //TODO ---> remove event listeners?
+	destroy() { //TODO ---> remove event listeners?
+		this.replaceHtml(""); //potentially unnecessary
 		this.entryNode.removeChild(this.node);
 		this.appended = false;
 	}
