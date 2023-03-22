@@ -8,12 +8,10 @@ export default () => {
 	handlePlayerCard(entryPoint);
 }
 
-
 let players: Map<number, Player> | null = null;
 let entryPoints: { selector: HTMLElement, card: HTMLElement } | null = null;
 
-
-const handlePlayerCard = (mainEntryPoint: HTMLElement) => {
+const handlePlayerCard = async (mainEntryPoint: HTMLElement) => {
 	entryPoints = {
 		selector: generateEntryPoint.selector(),
 		card: generateEntryPoint.card()
@@ -22,11 +20,6 @@ const handlePlayerCard = (mainEntryPoint: HTMLElement) => {
 	mainEntryPoint.appendChild(entryPoints.selector);
 	mainEntryPoint.appendChild(entryPoints.card);
 
-	loadPlayerData();
-}
-
-
-const loadPlayerData = async () => {
 	//read player data from json
 	const data = await getPlayerData();
 
@@ -39,14 +32,12 @@ const loadPlayerData = async () => {
 	render.playerSelector(Array.from(players.values()));
 }
 
-
 const getPlayerData = async (): Promise<PlayerData> => {
 	const res = await fetch("/static/data/player-stats.json").catch(e => {
 		throw new Error(`Failed to retrieve player data! - ${e}`);
 	});
 	return await res.json();
 }
-
 
 const render = {
 	loader() {
@@ -130,7 +121,6 @@ const render = {
 		`;
 	}
 }
-
 
 const generateEntryPoint = {
 	selector() {
