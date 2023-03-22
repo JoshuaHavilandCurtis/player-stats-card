@@ -2,51 +2,70 @@ import { Player, PlayerData, PlayerStatisticName } from "../models/player-card.m
 import { CustomSelector } from "./common/custom-selectors";
 
 export default () => {
-	const entry = document.getElementById("player-card-entrypoint");
-	if (entry === null) throw new Error("Failed to find player card entry point!");
+	const entryPoint = document.getElementById("player-card-entrypoint");
+	if (entryPoint === null) throw new Error("Failed to find player card entry point!");
 
-	new PlayerCard(entry);
+	handlePlayerCard(entryPoint);
 }
 
-class PlayerCard {
-	endpoint = "/static/data/player-stats.json";
-	players: Map<number, Player> | null = null;
-	selectorContainer: HTMLElement;
-	cardContainer: HTMLElement;
 
-	constructor(
-		public entryElmt: HTMLElement
-	) {
-		this.selectorContainer = this.generate.selectorContainer();
-		this.cardContainer = this.generate.cardContainer();
-		entryElmt.appendChild(this.selectorContainer);
-		entryElmt.appendChild(this.cardContainer);
+let players: Map<number, Player> | null = null;
+let entryPoints: { selector: HTMLElement, card: HTMLElement } | null = null;
 
-		this.loadPlayerData();
+
+const handlePlayerCard = (mainEntryPoint: HTMLElement) => {
+	entryPoints = {
+		selector: generateEntryPoint.selector(),
+		card: generateEntryPoint.card()
 	}
 
-	async loadPlayerData() {
-		//read player data from json
-		const data = await this.getPlayerData();
+	mainEntryPoint.appendChild(entryPoints.selector);
+	mainEntryPoint.appendChild(entryPoints.card);
 
-		//set the players
-		this.players = new Map();
-		for (const player of data.players) this.players.set(player.player.id, player);
+	loadPlayerData();
+}
 
-		//When we render the player selector, a selectbox is generated.
-		//Selectboxes by default set the first item to be the selected one.
-		//As a result, the first player is rendered when the page loads.
-		this.renderPlayerSelector(Array.from(this.players.values()));
-	}
 
-	renderPlayerSelector(players: Player[]) {
-		this.selectorContainer.innerHTML = `
+const loadPlayerData = async () => {
+	//read player data from json
+	const data = await getPlayerData();
+
+	players = new Map();
+	for (const player of data.players) players.set(player.player.id, player);
+
+	//When we render the player selector, a selectbox is generated.
+	//Selectboxes by default set the first item to be the selected one.
+	//As a result, the first player is rendered when the page loads.
+	render.playerSelector(Array.from(players.values()));
+}
+
+
+const getPlayerData = async (): Promise<PlayerData> => {
+	const res = await fetch("/static/data/player-stats.json").catch(e => {
+		throw new Error(`Failed to retrieve player data! - ${e}`);
+	});
+	return await res.json();
+}
+
+
+const render = {
+	loader() {
+		if (entryPoints === null) throw new Error("Entry points not set!");
+		const entryPoint = entryPoints.card;
+
+		entryPoint.innerHTML = ``;
+	},
+	playerSelector(players: Player[]) {
+		if (entryPoints === null) throw new Error("Entry points not set!");
+		const entryPoint = entryPoints.selector;
+
+		entryPoint.innerHTML = `
 		<select class="selector">
 			${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
 		</select>
 		`;
 
-		const selector = this.selectorContainer.querySelector<HTMLSelectElement>(".selector");
+		const selector = entryPoint.querySelector<HTMLSelectElement>(".selector");
 		if (selector === null) throw new Error("Failed to find generated selector element!");
 
 		//whenever selector changes, render the newly selected player
@@ -57,18 +76,20 @@ class PlayerCard {
 
 			//find the corresponding player
 			const playerId = selectedPlayer.value;
-			if (this.players === null) throw new Error("Failed to retrieve players!");
-			const player = this.players.get(parseInt(playerId));
+			if (players === null) throw new Error("Players not set!");
+			const player = players.find(player => player.player.id === parseInt(playerId));
 			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
 
 			//display this player
-			this.renderPlayer(player);
+			render.player(player);
 		});
 
 		new CustomSelector(selector);
-	}
+	},
+	player(player: Player) {
+		if (entryPoints === null) throw new Error("Entry points not set!");
+		const entryPoint = entryPoints.card;
 
-	renderPlayer(player: Player) {
 		const getStat = (statName: PlayerStatisticName) => player.stats.find(stat => stat.name === statName)?.value ?? null;
 		const renderStat = (stat: number | string | null) => stat === null ? "Unknown" : stat;
 
@@ -82,7 +103,7 @@ class PlayerCard {
 		const minsPlayed = getStat("mins_played");
 		const passesPerMinute = fwdPasses === null || backwardPasses === null || minsPlayed === null ? null : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
 
-		this.cardContainer.innerHTML = `
+		entryPoint.innerHTML = `
 		<div class="player-card">
 
 			<div class="player-card__header">
@@ -108,25 +129,18 @@ class PlayerCard {
 		</div>
 		`;
 	}
+}
 
-	private async getPlayerData(): Promise<PlayerData> {
-		const res = await fetch(this.endpoint).catch(e => {
-			throw new Error(`Failed to retrieve player data! - ${e}`);
-		});
-		return await res.json();
+
+const generateEntryPoint = {
+	selector() {
+		const selectorContainer = document.createElement("div");
+		selectorContainer.classList.add("player-selector-container");
+		return selectorContainer;
+	},
+	card() {
+		const cardContainer = document.createElement("div");
+		cardContainer.classList.add("player-card-container");
+		return cardContainer;
 	}
-
-	private generate = {
-		selectorContainer: () => {
-			const selectorContainer = document.createElement("div");
-			selectorContainer.classList.add("player-selector-container");
-			return selectorContainer;
-		},
-		cardContainer: () => {
-			const cardContainer = document.createElement("div");
-			cardContainer.classList.add("player-card-container");
-			return cardContainer;
-		}
-	}
-
 }
