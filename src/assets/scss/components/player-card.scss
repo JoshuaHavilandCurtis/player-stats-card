@@ -7,13 +7,13 @@
 .player-card {
 	$self: &;
 	$card-gutter: 1rem;
-	$spriteImageExample: 'http://www.caltronics.info/images/unused/social-icons.example.png';
+	$spriteImageExample: '../img/badges_sprite.png';
 
 	$mySprite: (url:$spriteImageExample,
 		names: ('facebook', 'twitter', 'youtube', 'instagram', 'linkedin', 'tumblr', 'google+', 'facebookGray', 'twitterGray', 'youtubeGray', 'instagramGray', 'linkedinGray', 'tumblrGray', 'google+Gray'
 		), //names of all of the icons in sprite
-		columns: 7, //sprite structure
-		rows: 2);
+		columns: 12, //sprite structure
+		rows: 10);
 
 	max-width: 300px;
 	margin: 0 auto;
@@ -39,11 +39,8 @@
 		position: relative;
 
 		#{ $self }__image {
-			width: 82px;
-			height: 82px;
 			display: block;
-			background: green;
-			@include backgroundImageBySprite($mySprite, 'linkedinGray', 60px);
+			@include backgroundImageBySprite($mySprite, 'linkedinGray', 90px);
 			position: absolute;
 			top: -2rem;
 			right: 1rem;

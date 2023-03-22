@@ -14,12 +14,12 @@
 		@return 0
 	}
 
-	@return calc($a / $b);
+	@return math.div($a, $b);
 }
 
 @function getImagePositionFromSprite($iconName, $sprite-name, $columns, $rows) {
 	$index: index($sprite-name, $iconName);
-	$row: ceil($index/$columns);
+	$row: ceil(math.div($index, $columns));
 	$column: $index % $columns;
 	@return percentage(divideEscape0(1, ($columns - 1))*($column - 1)) percentage(divideEscape0(1, ($rows - 1))*($row - 1));
 }

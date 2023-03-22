@@ -88,15 +88,12 @@ body {
   padding: 1rem;
 }
 .player-card__details .player-card__image {
-  width: 82px;
-  height: 82px;
   display: block;
-  background: green;
-  background-image: url("http://www.caltronics.info/images/unused/social-icons.example.png");
-  background-position: 66.6666666667% 100%;
-  height: 60px;
-  width: 60px;
-  background-size: auto 120px;
+  background-image: url("../img/badges_sprite.png");
+  background-position: -9.0909090909% 0%;
+  height: 90px;
+  width: 90px;
+  background-size: auto 900px;
   position: absolute;
   top: -2rem;
   right: 1rem;
