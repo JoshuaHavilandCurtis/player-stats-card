@@ -1,3 +1,9 @@
+.player-selector-container {
+	max-width: 300px;
+	margin: 0 auto;
+	background: white;
+}
+
 .player-card {
 	$self: &;
 	$card-gutter: 1rem;
@@ -11,11 +17,11 @@
 
 	&__header {
 		background-color: white;
-		padding: 0 $card-gutter;
+		padding: 2rem $card-gutter 0;
 
 		img {
 			margin-bottom: -5px;
-			max-width: 100%;
+			max-width: 200px;
 		}
 	}
 
@@ -55,6 +61,7 @@
 
 			#{ $self }__subtitle {
 				font-size: 1rem;
+				line-height: 1.5rem;
 			}
 		}
 
