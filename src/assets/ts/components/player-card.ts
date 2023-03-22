@@ -147,7 +147,7 @@ class PlayerCard extends Component {
 						${renderStat("Appearances", appearances) ?? ""}
 						${renderStat("Goals", goals) ?? ""}
 						${renderStat("Assists", assists) ?? ""}
-						${renderStat("Goals", goalsPerMatch) ?? ""}
+						${renderStat("Goals per match", goalsPerMatch) ?? ""}
 						${renderStat("Passes per minute", passesPerMinute) ?? ""}
 					</ul>
 				</div>
