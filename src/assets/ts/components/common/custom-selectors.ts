@@ -1,4 +1,3 @@
-import observeChildren from "../../lib/observeChildren";
 
 export default () => {
 	const customSelectorElmts = document.querySelectorAll<HTMLSelectElement>("[data-custom-selector]");
@@ -31,7 +30,7 @@ export class CustomSelector {
 	optionListElmt: HTMLElement;
 
 	private transitionDuration: number = 0;
-	private firingSelectBoxEvent = false;
+	// private firingSelectBoxEvent = false;
 
 	constructor(
 		public originalSelect: HTMLSelectElement
@@ -74,43 +73,11 @@ export class CustomSelector {
 		//close when clicking off
 		window.addEventListener("click", ev => {
 			const target = ev.target as HTMLElement;
-			if (!this.opened || target === this.selectedOptionElmt || this.elmt.contains(target)) return;
+			if (target === this.selectedOptionElmt || !this.opened || this.elmt.contains(target)) return;
 			this.close();
 		});
 
-		//observe if any options within the original selectbox are added/removed
-		observeChildren(this.originalSelect, (action, child) => {
-			const observedOption = child as HTMLOptionElement;
-
-			if (action === "added") {
-				const newOption = this.generate.option(observedOption);
-				this.addOption(newOption);
-
-			} else if (action === "removed") {
-				const existingOption = this.options.find(option => option.originalElmt === observedOption);
-				if (existingOption === undefined) throw new Error("Failed to find a corresponding custom option!");
-				this.removeOption(existingOption);
-			}
-		});
-
-		//listen to any changes to the original select box
-		this.originalSelect.addEventListener("change", () => {
-			if (this.firingSelectBoxEvent) { // ...but make sure to ignore events that we fired ourselves
-				this.firingSelectBoxEvent = false;
-				return;
-			}
-
-			//TODO ---> setTimeout is not ideal, but it fixes a problem where event listeners are fired before a mutation event occurs
-			setTimeout(() => {
-				const originalSelectedOption = this.originalSelect.selectedOptions[0];
-				if (originalSelectedOption === undefined) return;
-
-				const option = this.options.find(option => option.value === originalSelectedOption.value);
-				if (option === undefined) throw new Error("Failed to find a corresponding custom option!");
-
-				this.selectOption(option);
-			}, 0);
-		});
+		//this.observeOriginalSelect();
 	}
 
 	open() {
@@ -154,7 +121,7 @@ export class CustomSelector {
 		this.selectedOption = option;
 
 		//dispatch change event
-		this.firingSelectBoxEvent = true;
+		// this.firingSelectBoxEvent = true;
 		this.originalSelect.dispatchEvent(new Event("change"));
 
 		this.close();
@@ -168,6 +135,42 @@ export class CustomSelector {
 
 		}, this.transitionDuration);
 	}
+
+	// private observeOriginalSelect() {
+	// 	//observe if any options within the original selectbox are added/removed
+	// 	observeChildren(this.originalSelect, (action, child) => {
+	// 		const observedOption = child as HTMLOptionElement;
+
+	// 		if (action === "added") {
+	// 			const newOption = this.generate.option(observedOption);
+	// 			this.addOption(newOption);
+
+	// 		} else if (action === "removed") {
+	// 			const existingOption = this.options.find(option => option.originalElmt === observedOption);
+	// 			if (existingOption === undefined) throw new Error("Failed to find a corresponding custom option!");
+	// 			this.removeOption(existingOption);
+	// 		}
+	// 	});
+
+	// 	//listen to any changes to the original select box
+	// 	this.originalSelect.addEventListener("change", () => {
+	// 		if (this.firingSelectBoxEvent) { // ...but make sure to ignore events that we fired ourselves
+	// 			this.firingSelectBoxEvent = false;
+	// 			return;
+	// 		}
+
+	// 		//TODO ---> setTimeout is not ideal, but it fixes a problem where event listeners are fired before a mutation event occurs
+	// 		setTimeout(() => {
+	// 			const originalSelectedOption = this.originalSelect.selectedOptions[0];
+	// 			if (originalSelectedOption === undefined) return;
+
+	// 			const option = this.options.find(option => option.value === originalSelectedOption.value);
+	// 			if (option === undefined) throw new Error("Failed to find a corresponding custom option!");
+
+	// 			this.selectOption(option);
+	// 		}, 0);
+	// 	});
+	// }
 
 	private generate = {
 		elmt: (): HTMLElement => {
