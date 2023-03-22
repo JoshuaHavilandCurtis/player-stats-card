@@ -1,0 +1,43 @@
+.loader {
+	&-container {
+		position: absolute;
+		inset: 0 0 0 0;
+
+		width: 100%;
+		min-width: 10rem;
+		height: 100%;
+		min-height: 10rem;
+
+		z-index: 10;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	display:flex;
+
+	$size: 3rem;
+	width: $size;
+	height: $size;
+
+	border-radius:100%;
+	border:10px solid white;
+
+	border-top: 10px solid var(--pink);
+	border-right: 5px solid white;
+	border-bottom: 5px solid white;
+	border-left: 10px solid var(--pink);
+
+	animation: Load 750ms linear infinite;
+
+	@keyframes Load {
+		0% {
+			transform: rotate(0);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+}

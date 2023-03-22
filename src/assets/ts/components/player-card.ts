@@ -1,6 +1,8 @@
 import Component from "../lib/component.class";
+import delay from "../lib/delay";
 import { Player, PlayerData, PlayerStatisticName } from "../models/player-card.models";
 import { CustomSelector } from "./common/custom-selectors";
+import { LoaderComponent } from "./common/loader.component";
 
 export default () => {
 	const entryPoint = document.getElementById("player-card-entrypoint");
@@ -12,15 +14,17 @@ export default () => {
 
 /**
  * Handle loading in the player card:
+ * - Create components
  * - Fetch player data from API
  * - Render components using this player data
  */
 
 const handlePlayerCard = async (entryPoint: HTMLElement) => {
+	//define components
 	const loader = new LoaderComponent(entryPoint);
-	const playerCardSelector = new PlayerCardSelectorComponent(entryPoint);
+	const playerCardContainer = new PlayerCardContainerComponent(entryPoint);
 
-	//show the loader
+	//render the loader
 	loader.render();
 
 	//read player data from json
@@ -28,11 +32,12 @@ const handlePlayerCard = async (entryPoint: HTMLElement) => {
 	const players = new Map();
 	for (const player of data.players) players.set(player.player.id, player);
 
-	//remove the loader
+	//un-render the loader
 	loader.unrender();
 
+	//render the player card container
 	//the first player is rendered when the page loads: selectboxes will select the first option by default
-	playerCardSelector.render({ players: Array.from(players.values()) });
+	playerCardContainer.render({ playerCardSelector: { players: Array.from(players.values()) } });
 }
 
 
@@ -45,21 +50,28 @@ const getPlayerData = async (): Promise<PlayerData> => {
 	const res = await fetch("/static/data/player-stats.json").catch(e => {
 		throw new Error(`Failed to retrieve player data! - ${e}`);
 	});
+	await delay(4000);
 	return await res.json();
 }
 
 
 /**
- * A loading wheel that appears over the player card container while we wait for
- * promises to resolve
+ * A container component for the card selector component, and for the card component
  */
 
-class LoaderComponent extends Component {
-	render() {
-		this.replaceHtml(`<p>Loader</p>`);
+class PlayerCardContainerComponent extends Component {
+	playerCardSelector: PlayerCardSelectorComponent | null = null;
+
+	render(props: { playerCardSelector: { players: Player[] } }) {
+		this.replaceHtml(`<div class="player-card-container"></div>`);
+
+		const container = this.contentEntryPoint.querySelector<HTMLElement>(".player-card-container");
+		if (container === null) throw new Error("Failed to find generated player card container!");
+
+		this.playerCardSelector = new PlayerCardSelectorComponent(container);
+		this.playerCardSelector.render(props.playerCardSelector);
 	}
 }
-
 
 /**
  * A custom selectbox that switches the player card that's currently being
@@ -71,11 +83,11 @@ class PlayerCardSelectorComponent extends Component {
 
 	render(props: { players: Player[] }) {
 		this.replaceHtml(`
-		<div class="player-card-selector__wrapper">
-			<select class="player-card-selector selector">
-				${props.players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
-			</select>
-		</div>
+			<div class="player-card-selector__wrapper">
+				<select class="player-card-selector selector">
+					${props.players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
+				</select>
+			</div>
 		`);
 
 		const selector = this.contentEntryPoint.querySelector<HTMLSelectElement>(".selector");
@@ -120,25 +132,25 @@ class PlayerCardComponent extends Component {
 		const passesPerMinute = fwdPasses === null || backwardPasses === null || minsPlayed === null ? null : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
 
 		this.replaceHtml(`
-		<div class="player-card">
-			<div class="player-card__header">
-				<img src="/static/img/p${props.player.player.id}.png">
-			</div>
-			<div class="player-card__details">
-				<div class="player-card__image ${props.player.player.currentTeam.shortName.toLowerCase().replace(" ", "-")}"></div>
-				<div class="player-card-headings">
-					<h1 class="player-card__heading">${props.player.player.name.first} ${props.player.player.name.last}</h1>
-					<h2 class="player-card__subtitle">${props.player.player.info.positionInfo}</h2>
+			<div class="player-card">
+				<div class="player-card__header">
+					<img src="/static/img/p${props.player.player.id}.png">
 				</div>
-				<ul class="player-card__table">
-					<li>Appearances <span>${renderStat(appearances)}</span></li>
-					<li>Goals <span>${renderStat(goals)}</span></li>
-					<li>Assists <span>${renderStat(assists)}</span></li>
-					<li>Goals per match <span>${renderStat(goalsPerMatch)}</span></li>
-					<li>Passes per minute <span>${renderStat(passesPerMinute)}</span></li>
-				</ul>
+				<div class="player-card__details">
+					<div class="player-card__image ${props.player.player.currentTeam.shortName.toLowerCase().replace(" ", "-")}"></div>
+					<div class="player-card-headings">
+						<h1 class="player-card__heading">${props.player.player.name.first} ${props.player.player.name.last}</h1>
+						<h2 class="player-card__subtitle">${props.player.player.info.positionInfo}</h2>
+					</div>
+					<ul class="player-card__table">
+						<li>Appearances <span>${renderStat(appearances)}</span></li>
+						<li>Goals <span>${renderStat(goals)}</span></li>
+						<li>Assists <span>${renderStat(assists)}</span></li>
+						<li>Goals per match <span>${renderStat(goalsPerMatch)}</span></li>
+						<li>Passes per minute <span>${renderStat(passesPerMinute)}</span></li>
+					</ul>
+				</div>
 			</div>
-		</div>
 		`);
 	}
 }

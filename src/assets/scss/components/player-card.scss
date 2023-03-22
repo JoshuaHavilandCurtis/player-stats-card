@@ -2,6 +2,9 @@
 	max-width: 300px;
 	margin: 0 auto;
 	background: white;
+	position: relative;
+
+	animation: FadeIn 300ms ease-in-out;
 }
 
 .player-card-selector {
@@ -45,7 +48,7 @@
 			border-radius: 100%;
 		}
 
-		background-color: #e90052;
+		background-color: var(--pink);
 		padding: $card-gutter;
 
 		.player-card-headings {
