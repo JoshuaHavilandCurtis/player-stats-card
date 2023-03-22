@@ -4,14 +4,28 @@
 	background: white;
 }
 
+.player-selector {
+	&__wrapper {
+		padding: 1rem 1rem 0;
+	}
+}
+
+// @for $i from 1 through 120 {
+// 	.player-card {
+// 		$mySprite: (url:$spriteImageExample,
+// 			names: ($i), //names of all of the icons in sprite
+// 			columns: 12, //sprite structure
+// 			rows: 10);
+// 	}
+// }
+
+
 .player-card {
 	$self: &;
 	$card-gutter: 1rem;
 	$spriteImageExample: '../img/badges_sprite.png';
-
 	$mySprite: (url:$spriteImageExample,
-		names: ('facebook', 'twitter', 'youtube', 'instagram', 'linkedin', 'tumblr', 'google+', 'facebookGray', 'twitterGray', 'youtubeGray', 'instagramGray', 'linkedinGray', 'tumblrGray', 'google+Gray'
-		), //names of all of the icons in sprite
+		names: ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'), //names of all of the icons in sprite
 		columns: 12, //sprite structure
 		rows: 10);
 
@@ -40,11 +54,14 @@
 
 		#{ $self }__image {
 			display: block;
-			@include backgroundImageBySprite($mySprite, 'linkedinGray', 90px);
 			position: absolute;
 			top: -2rem;
 			right: 1rem;
 			border-radius: 100%;
+
+			&.spurs {
+				@include backgroundImageBySprite($mySprite, 'man-city', 100px);
+			}
 		}
 
 		background-color: #e90052;
@@ -55,7 +72,7 @@
 			flex-direction: column;
 			gap: 5px;
 
-			padding-right: 5.3rem;
+			padding-right: 6.5rem;
 
 			#{ $self }__heading,
 			#{ $self }__subtitle {
