@@ -1,4 +1,3 @@
-
 export default () => {
 	const customSelectorElmts = document.querySelectorAll<HTMLSelectElement>("[data-custom-selector]");
 	for (const customSelectorElmt of customSelectorElmts) new CustomSelector(customSelectorElmt);
@@ -15,7 +14,8 @@ type CustomSelectorOption = {
  * 
  * Underneath, it still uses a standard selectbox which gets updated alongside this
  * one, so formdata still works.
- * */
+ */
+
 export class CustomSelector {
 	opened = false;
 	options: CustomSelectorOption[];

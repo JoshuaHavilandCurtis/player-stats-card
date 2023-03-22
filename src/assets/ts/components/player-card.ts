@@ -1,3 +1,4 @@
+import Component from "../lib/component.class";
 import { Player, PlayerData, PlayerStatisticName } from "../models/player-card.models";
 import { CustomSelector } from "./common/custom-selectors";
 
@@ -8,35 +9,37 @@ export default () => {
 	handlePlayerCard(entryPoint);
 }
 
-let players: Map<number, Player> | null = null;
-let entryPoints: { loader: HTMLElement, selector: HTMLElement, card: HTMLElement } | null = null;
 
-const handlePlayerCard = async (mainEntryPoint: HTMLElement) => {
-	entryPoints = {
-		loader: generateEntryPoint("player-loader"),
-		selector: generateEntryPoint("player-selector-container"),
-		card: generateEntryPoint("player-card-container")
-	}
+/**
+ * Handle loading in the player card:
+ * - Fetch player data from API
+ * - Render components using this player data
+ */
 
-	mainEntryPoint.appendChild(entryPoints.loader);
-	mainEntryPoint.appendChild(entryPoints.selector);
-	mainEntryPoint.appendChild(entryPoints.card);
+const handlePlayerCard = async (entryPoint: HTMLElement) => {
+	const loader = new LoaderComponent(entryPoint);
+	const playerCardSelector = new PlayerCardSelectorComponent(entryPoint);
 
-	render.loader();
+	//show the loader
+	loader.render();
 
 	//read player data from json
 	const data = await getPlayerData();
-
-	players = new Map();
+	const players = new Map();
 	for (const player of data.players) players.set(player.player.id, player);
 
-	removeEntryPoint(mainEntryPoint, entryPoints.loader);
+	//remove the loader
+	loader.unrender();
 
-	//When we render the player selector, a selectbox is generated.
-	//Selectboxes by default set the first item to be the selected one.
-	//As a result, the first player is rendered when the page loads.
-	render.selector(Array.from(players.values()));
+	//the first player is rendered when the page loads: selectboxes will select the first option by default
+	playerCardSelector.render({ players: Array.from(players.values()) });
 }
+
+
+/**
+ * Fetch player data from API
+ * @returns Promise for a PlayerData object
+ */
 
 const getPlayerData = async (): Promise<PlayerData> => {
 	const res = await fetch("/static/data/player-stats.json").catch(e => {
@@ -45,26 +48,37 @@ const getPlayerData = async (): Promise<PlayerData> => {
 	return await res.json();
 }
 
-const render = {
-	loader() {
-		if (entryPoints === null) throw new Error("Entry points not set!");
-		const entryPoint = entryPoints.loader;
 
-		entryPoint.innerHTML = `Loader`;
-	},
-	selector(players: Player[]) {
-		if (entryPoints === null) throw new Error("Entry points not set!");
-		const entryPoint = entryPoints.selector;
+/**
+ * A loading wheel that appears over the player card container while we wait for
+ * promises to resolve
+ */
 
-		entryPoint.innerHTML = `
-		<div class="player-selector__wrapper">
-			<select class="selector">
-				${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
+class LoaderComponent extends Component {
+	render() {
+		this.replaceHtml(`<p>Loader</p>`);
+	}
+}
+
+
+/**
+ * A custom selectbox that switches the player card that's currently being
+ * rendered when the value changes
+ */
+
+class PlayerCardSelectorComponent extends Component {
+	playerCard = new PlayerCardComponent(this.entryPoint);
+
+	render(props: { players: Player[] }) {
+		this.replaceHtml(`
+		<div class="player-card-selector__wrapper">
+			<select class="player-card-selector selector">
+				${props.players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
 			</select>
 		</div>
-		`;
+		`);
 
-		const selector = entryPoint.querySelector<HTMLSelectElement>(".selector");
+		const selector = this.contentEntryPoint.querySelector<HTMLSelectElement>(".selector");
 		if (selector === null) throw new Error("Failed to find generated selector element!");
 
 		//whenever selector changes, render the newly selected player
@@ -75,21 +89,24 @@ const render = {
 
 			//find the corresponding player
 			const playerId = selectedPlayer.value;
-			if (players === null) throw new Error("Players not set!");
-			const player = players.find(player => player.player.id === parseInt(playerId));
+			const player = props.players.find(player => player.player.id === parseInt(playerId));
 			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
 
 			//display this player
-			render.card(player);
+			this.playerCard.render({ player });
 		});
 
 		new CustomSelector(selector);
-	},
-	card(player: Player) {
-		if (entryPoints === null) throw new Error("Entry points not set!");
-		const entryPoint = entryPoints.card;
+	}
+}
 
-		const getStat = (statName: PlayerStatisticName) => player.stats.find(stat => stat.name === statName)?.value ?? null;
+/**
+ * A card that contains information about a player
+ */
+
+class PlayerCardComponent extends Component {
+	render(props: { player: Player }) {
+		const getStat = (statName: PlayerStatisticName) => props.player.stats.find(stat => stat.name === statName)?.value ?? null;
 		const renderStat = (stat: number | string | null) => stat === null ? "Unknown" : stat;
 
 		//read / calculate stats
@@ -102,20 +119,17 @@ const render = {
 		const minsPlayed = getStat("mins_played");
 		const passesPerMinute = fwdPasses === null || backwardPasses === null || minsPlayed === null ? null : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
 
-		entryPoint.innerHTML = `
+		this.replaceHtml(`
 		<div class="player-card">
 			<div class="player-card__header">
-				<img src="/static/img/p${player.player.id}.png">
+				<img src="/static/img/p${props.player.player.id}.png">
 			</div>
-
 			<div class="player-card__details">
-				<div class="player-card__image ${player.player.currentTeam.shortName.toLowerCase().replace(" ", "-")}"></div>
-
+				<div class="player-card__image ${props.player.player.currentTeam.shortName.toLowerCase().replace(" ", "-")}"></div>
 				<div class="player-card-headings">
-					<h1 class="player-card__heading">${player.player.name.first} ${player.player.name.last}</h1>
-					<h2 class="player-card__subtitle">${player.player.info.positionInfo}</h2>
+					<h1 class="player-card__heading">${props.player.player.name.first} ${props.player.player.name.last}</h1>
+					<h2 class="player-card__subtitle">${props.player.player.info.positionInfo}</h2>
 				</div>
-
 				<ul class="player-card__table">
 					<li>Appearances <span>${renderStat(appearances)}</span></li>
 					<li>Goals <span>${renderStat(goals)}</span></li>
@@ -125,16 +139,6 @@ const render = {
 				</ul>
 			</div>
 		</div>
-		`;
+		`);
 	}
-}
-
-const removeEntryPoint = (mainEntryPoint: HTMLElement, entryPoint: HTMLElement) => {
-	mainEntryPoint.removeChild(entryPoint);
-}
-
-const generateEntryPoint = (className: string): HTMLDivElement => {
-	const selectorContainer = document.createElement("div");
-	selectorContainer.classList.add(className);
-	return selectorContainer;
 }

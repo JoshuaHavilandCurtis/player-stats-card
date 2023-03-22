@@ -1,33 +1,18 @@
-.player-selector-container {
+.player-card-container {
 	max-width: 300px;
 	margin: 0 auto;
 	background: white;
 }
 
-.player-selector {
+.player-card-selector {
 	&__wrapper {
 		padding: 1rem 1rem 0;
 	}
 }
 
-// @for $i from 1 through 120 {
-// 	.player-card {
-// 		$mySprite: (url:$spriteImageExample,
-// 			names: ($i), //names of all of the icons in sprite
-// 			columns: 12, //sprite structure
-// 			rows: 10);
-// 	}
-// }
-
-
 .player-card {
 	$self: &;
 	$card-gutter: 1rem;
-	$spriteImageExample: '../img/badges_sprite.png';
-	$mySprite: (url:$spriteImageExample,
-		names: ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'), //names of all of the icons in sprite
-		columns: 12, //sprite structure
-		rows: 10);
 
 	max-width: 300px;
 	margin: 0 auto;
@@ -58,10 +43,6 @@
 			top: -2rem;
 			right: 1rem;
 			border-radius: 100%;
-
-			&.spurs {
-				@include backgroundImageBySprite($mySprite, 'man-city', 100px);
-			}
 		}
 
 		background-color: #e90052;
