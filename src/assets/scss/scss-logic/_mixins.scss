@@ -1,0 +1,36 @@
+@mixin flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+@mixin flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
+
+@function divideEscape0($a, $b) {
+	@if ($b ==0) {
+		@return 0
+	}
+
+	@return calc($a / $b);
+}
+
+@function getImagePositionFromSprite($iconName, $sprite-name, $columns, $rows) {
+	$index: index($sprite-name, $iconName);
+	$row: ceil($index/$columns);
+	$column: $index % $columns;
+	@return percentage(divideEscape0(1, ($columns - 1))*($column - 1)) percentage(divideEscape0(1, ($rows - 1))*($row - 1));
+}
+
+@mixin backgroundImageBySprite($sprite, $name, $size) {
+	background-image: url(map_get($sprite,url));
+	background-position: getImagePositionFromSprite($name,
+			map_get($sprite, names),
+			map_get($sprite, columns),
+			map_get($sprite, rows));
+	height: $size;
+	width: $size;
+	background-size: auto $size * (map_get($sprite, rows));
+}
