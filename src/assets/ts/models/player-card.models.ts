@@ -33,6 +33,8 @@ export type PlayerInfo = {
 }
 
 export type PlayerStatistic = {
-	name: "goals" | "losses" | "wins" | "draws" | "fwd_pass" | "goal_assist" | "appearances" | "mins_played" | "backward_pass",
+	name: PlayerStatisticName,
 	value: number
 }
+
+export type PlayerStatisticName = "goals" | "losses" | "wins" | "draws" | "fwd_pass" | "goal_assist" | "appearances" | "mins_played" | "backward_pass"

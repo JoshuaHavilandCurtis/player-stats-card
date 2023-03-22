@@ -14,12 +14,14 @@ type CustomSelectorOption = {
 /** 
  * A custom selectbox that styles better than the standard one.
  * 
- * Underneath, it still uses a standard selectbox, so formdata still works, as well as any standard selectbox events. Theres
- * also a MutationObserver that tracks the children of the selectbox too.
+ * Underneath, it still uses a standard selectbox which gets updated alongside this
+ * one, so formdata still works, as well as any standard selectbox events. Theres also 
+ * a MutationObserver that tracks the children of the standard selectbox, and updates the
+ * children of new one as well.
  * 
  * It *should* behave exactly the same as a standard selectbox!
  * */
-class CustomSelector {
+export class CustomSelector {
 	opened = false;
 	options: CustomSelectorOption[];
 	selectedOption: CustomSelectorOption | null = null;
@@ -37,8 +39,10 @@ class CustomSelector {
 		this.elmt = this.generate.elmt();
 
 		//put attributes currently on the selectbox onto the containing elmt
-		this.elmt.id = originalSelect.id;
-		this.elmt.className = originalSelect.className;
+		const id = originalSelect.getAttribute("id");
+		const className = originalSelect.getAttribute("class");
+		if (id !== null) this.elmt.id = id;
+		if (className !== null) this.elmt.className = className;
 		originalSelect.removeAttribute("id");
 		originalSelect.removeAttribute("class");
 		originalSelect.removeAttribute("data-custom-selector");
@@ -60,7 +64,7 @@ class CustomSelector {
 		const originalSelectedOption = this.options.find(option => originalOptions.find(originalOption => originalOption.value === option.value && originalOption.selected));
 		if (originalSelectedOption !== undefined) this.selectOption(originalSelectedOption);
 
-		//custom elements are ready: add them to the dom now
+		//custom elements are ready: add them to the DOM now
 		this.elmt.appendChild(this.selectedOptionElmt);
 		this.elmt.appendChild(this.optionListElmt);
 
@@ -69,7 +73,8 @@ class CustomSelector {
 
 		//close when clicking off
 		window.addEventListener("click", ev => {
-			if (ev.target === this.selectedOptionElmt || !this.opened || ev.target === this.elmt || this.elmt.contains(ev.target as HTMLElement)) return;
+			const target = ev.target as HTMLElement;
+			if (!this.opened || target === this.selectedOptionElmt || this.elmt.contains(target)) return;
 			this.close();
 		});
 
