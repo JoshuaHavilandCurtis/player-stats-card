@@ -73,6 +73,12 @@ class PlayerCardContainer extends Component {
 		this.playerCardSelector = new PlayerCardSelector(container, this.playerCard);
 		this.playerCardSelector.render(props.playerCardSelector);
 	}
+
+	unrender() {
+		this.replaceHtml("");
+		this.playerCardSelector = null;
+		this.playerCard = null;
+	}
 }
 
 /**
