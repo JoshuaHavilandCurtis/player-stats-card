@@ -39,19 +39,48 @@ class PlayerCard {
 		this.renderPlayerSelector(Array.from(this.players.values()));
 	}
 
+	renderPlayerSelector(players: Player[]) {
+		this.selectorContainer.innerHTML = `
+		<select class="selector">
+			${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
+		</select>
+		`;
+
+		const selector = this.selectorContainer.querySelector<HTMLSelectElement>(".selector");
+		if (selector === null) throw new Error("Failed to find generated selector element!");
+
+		//whenever selector changes, render the newly selected player
+		selector.addEventListener("change", () => {
+			//get the selected option
+			const selectedPlayer = selector.selectedOptions[0];
+			if (selectedPlayer === undefined) return;
+
+			//find the corresponding player
+			const playerId = selectedPlayer.value;
+			if (this.players === null) throw new Error("Failed to retrieve players!");
+			const player = this.players.get(parseInt(playerId));
+			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
+
+			//display this player
+			this.renderPlayer(player);
+		});
+
+		new CustomSelector(selector);
+	}
+
 	renderPlayer(player: Player) {
-		const getStat = (statName: PlayerStatisticName) => player.stats.find(stat => stat.name === statName)?.value;
-		const renderStat = (stat: number | string | undefined) => stat === undefined ? "Unknown" : stat;
+		const getStat = (statName: PlayerStatisticName) => player.stats.find(stat => stat.name === statName)?.value ?? null;
+		const renderStat = (stat: number | string | null) => stat === null ? "Unknown" : stat;
 
 		//read / calculate stats
 		const goals = getStat("goals");
 		const appearances = getStat("appearances");
 		const assists = getStat("goal_assist");
-		const goalsPerMatch = goals === undefined || appearances === undefined ? undefined : (goals / appearances).toFixed(2);
+		const goalsPerMatch = goals === null || appearances === null ? null : (goals / appearances).toFixed(2);
 		const fwdPasses = getStat("fwd_pass");
 		const backwardPasses = getStat("backward_pass");
 		const minsPlayed = getStat("mins_played");
-		const passesPerMinute = fwdPasses === undefined || backwardPasses === undefined || minsPlayed === undefined ? undefined : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
+		const passesPerMinute = fwdPasses === null || backwardPasses === null || minsPlayed === null ? null : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
 
 		this.cardContainer.innerHTML = `
 		<div class="player-card">
@@ -78,35 +107,6 @@ class PlayerCard {
 			</div>
 		</div>
 		`;
-	}
-
-	renderPlayerSelector(players: Player[]) {
-		this.selectorContainer.innerHTML = `
-		<select class="selector">
-			${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`)}
-		</select>
-		`;
-
-		const selector = this.selectorContainer.querySelector<HTMLSelectElement>(".selector");
-		if (selector === null) throw new Error("Failed to find generated selector element!");
-
-		//whenever selector changes, render the newly selected player
-		selector.addEventListener("change", () => {
-			//get the selected option
-			const selectedPlayer = selector.selectedOptions[0];
-			if (selectedPlayer === undefined) return;
-
-			//find the corresponding player
-			const playerId = selectedPlayer.value;
-			if (this.players === null) throw new Error("Failed to retrieve players!");
-			const player = this.players.get(parseInt(playerId));
-			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
-
-			//display this player
-			this.renderPlayer(player);
-		});
-
-		new CustomSelector(selector);
 	}
 
 	private async getPlayerData(): Promise<PlayerData> {

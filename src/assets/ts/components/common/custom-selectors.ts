@@ -14,11 +14,7 @@ type CustomSelectorOption = {
  * A custom selectbox that styles better than the standard one.
  * 
  * Underneath, it still uses a standard selectbox which gets updated alongside this
- * one, so formdata still works, as well as any standard selectbox events. Theres also 
- * a MutationObserver that tracks the children of the standard selectbox, and updates the
- * children of new one as well.
- * 
- * It *should* behave exactly the same as a standard selectbox!
+ * one, so formdata still works.
  * */
 export class CustomSelector {
 	opened = false;
@@ -30,7 +26,6 @@ export class CustomSelector {
 	optionListElmt: HTMLElement;
 
 	private transitionDuration: number = 0;
-	// private firingSelectBoxEvent = false;
 
 	constructor(
 		public originalSelect: HTMLSelectElement
@@ -38,13 +33,10 @@ export class CustomSelector {
 		this.elmt = this.generate.elmt();
 
 		//put attributes currently on the selectbox onto the containing elmt
-		const id = originalSelect.getAttribute("id");
-		const className = originalSelect.getAttribute("class");
-		if (id !== null) this.elmt.id = id;
-		if (className !== null) this.elmt.className = className;
-		originalSelect.removeAttribute("id");
-		originalSelect.removeAttribute("class");
-		originalSelect.removeAttribute("data-custom-selector");
+		for (const attribute of this.originalSelect.attributes) {
+			this.elmt.setAttribute(attribute.name, attribute.value);
+			this.originalSelect.removeAttribute(attribute.name);
+		}
 
 		//and then replace the selectbox with this containing elmt
 		this.originalSelect.replaceWith(this.elmt);
@@ -76,8 +68,6 @@ export class CustomSelector {
 			if (target === this.selectedOptionElmt || !this.opened || this.elmt.contains(target)) return;
 			this.close();
 		});
-
-		//this.observeOriginalSelect();
 	}
 
 	open() {
@@ -115,14 +105,11 @@ export class CustomSelector {
 		//update original select box
 		this.originalSelect.selectedIndex = -1;
 		option.originalElmt.selected = true;
+		this.originalSelect.dispatchEvent(new Event("change"));
 
 		//update the selected option
 		const previouslySelectedOption = this.selectedOption;
 		this.selectedOption = option;
-
-		//dispatch change event
-		// this.firingSelectBoxEvent = true;
-		this.originalSelect.dispatchEvent(new Event("change"));
 
 		this.close();
 
@@ -135,42 +122,6 @@ export class CustomSelector {
 
 		}, this.transitionDuration);
 	}
-
-	// private observeOriginalSelect() {
-	// 	//observe if any options within the original selectbox are added/removed
-	// 	observeChildren(this.originalSelect, (action, child) => {
-	// 		const observedOption = child as HTMLOptionElement;
-
-	// 		if (action === "added") {
-	// 			const newOption = this.generate.option(observedOption);
-	// 			this.addOption(newOption);
-
-	// 		} else if (action === "removed") {
-	// 			const existingOption = this.options.find(option => option.originalElmt === observedOption);
-	// 			if (existingOption === undefined) throw new Error("Failed to find a corresponding custom option!");
-	// 			this.removeOption(existingOption);
-	// 		}
-	// 	});
-
-	// 	//listen to any changes to the original select box
-	// 	this.originalSelect.addEventListener("change", () => {
-	// 		if (this.firingSelectBoxEvent) { // ...but make sure to ignore events that we fired ourselves
-	// 			this.firingSelectBoxEvent = false;
-	// 			return;
-	// 		}
-
-	// 		//TODO ---> setTimeout is not ideal, but it fixes a problem where event listeners are fired before a mutation event occurs
-	// 		setTimeout(() => {
-	// 			const originalSelectedOption = this.originalSelect.selectedOptions[0];
-	// 			if (originalSelectedOption === undefined) return;
-
-	// 			const option = this.options.find(option => option.value === originalSelectedOption.value);
-	// 			if (option === undefined) throw new Error("Failed to find a corresponding custom option!");
-
-	// 			this.selectOption(option);
-	// 		}, 0);
-	// 	});
-	// }
 
 	private generate = {
 		elmt: (): HTMLElement => {
