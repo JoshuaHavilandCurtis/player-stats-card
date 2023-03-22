@@ -9,16 +9,20 @@ export default () => {
 }
 
 let players: Map<number, Player> | null = null;
-let entryPoints: { selector: HTMLElement, card: HTMLElement } | null = null;
+let entryPoints: { loader: HTMLElement, selector: HTMLElement, card: HTMLElement } | null = null;
 
 const handlePlayerCard = async (mainEntryPoint: HTMLElement) => {
 	entryPoints = {
-		selector: generateEntryPoint.selector(),
-		card: generateEntryPoint.card()
+		loader: generateEntryPoint("player-loader"),
+		selector: generateEntryPoint("player-selector-container"),
+		card: generateEntryPoint("player-card-container")
 	}
 
+	mainEntryPoint.appendChild(entryPoints.loader);
 	mainEntryPoint.appendChild(entryPoints.selector);
 	mainEntryPoint.appendChild(entryPoints.card);
+
+	render.loader();
 
 	//read player data from json
 	const data = await getPlayerData();
@@ -26,10 +30,12 @@ const handlePlayerCard = async (mainEntryPoint: HTMLElement) => {
 	players = new Map();
 	for (const player of data.players) players.set(player.player.id, player);
 
+	removeEntryPoint(mainEntryPoint, entryPoints.loader);
+
 	//When we render the player selector, a selectbox is generated.
 	//Selectboxes by default set the first item to be the selected one.
 	//As a result, the first player is rendered when the page loads.
-	render.playerSelector(Array.from(players.values()));
+	render.selector(Array.from(players.values()));
 }
 
 const getPlayerData = async (): Promise<PlayerData> => {
@@ -42,18 +48,20 @@ const getPlayerData = async (): Promise<PlayerData> => {
 const render = {
 	loader() {
 		if (entryPoints === null) throw new Error("Entry points not set!");
-		const entryPoint = entryPoints.card;
+		const entryPoint = entryPoints.loader;
 
-		entryPoint.innerHTML = ``;
+		entryPoint.innerHTML = `Loader`;
 	},
-	playerSelector(players: Player[]) {
+	selector(players: Player[]) {
 		if (entryPoints === null) throw new Error("Entry points not set!");
 		const entryPoint = entryPoints.selector;
 
 		entryPoint.innerHTML = `
-		<select class="selector">
-			${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
-		</select>
+		<div class="player-selector__wrapper">
+			<select class="selector">
+				${players.map(player => `<option value="${player.player.id}">${player.player.name.first} ${player.player.name.last}</option>`).join("")}
+			</select>
+		</div>
 		`;
 
 		const selector = entryPoint.querySelector<HTMLSelectElement>(".selector");
@@ -72,12 +80,12 @@ const render = {
 			if (player === undefined) throw new Error("Failed to find a player for the provided id!");
 
 			//display this player
-			render.player(player);
+			render.card(player);
 		});
 
 		new CustomSelector(selector);
 	},
-	player(player: Player) {
+	card(player: Player) {
 		if (entryPoints === null) throw new Error("Entry points not set!");
 		const entryPoint = entryPoints.card;
 
@@ -96,13 +104,12 @@ const render = {
 
 		entryPoint.innerHTML = `
 		<div class="player-card">
-
 			<div class="player-card__header">
 				<img src="/static/img/p${player.player.id}.png">
 			</div>
 
 			<div class="player-card__details">
-				<div class="player-card__image"></div>
+				<div class="player-card__image ${player.player.currentTeam.shortName.toLowerCase().replace(" ", "-")}"></div>
 
 				<div class="player-card-headings">
 					<h1 class="player-card__heading">${player.player.name.first} ${player.player.name.last}</h1>
@@ -122,15 +129,12 @@ const render = {
 	}
 }
 
-const generateEntryPoint = {
-	selector() {
-		const selectorContainer = document.createElement("div");
-		selectorContainer.classList.add("player-selector-container");
-		return selectorContainer;
-	},
-	card() {
-		const cardContainer = document.createElement("div");
-		cardContainer.classList.add("player-card-container");
-		return cardContainer;
-	}
+const removeEntryPoint = (mainEntryPoint: HTMLElement, entryPoint: HTMLElement) => {
+	mainEntryPoint.removeChild(entryPoint);
+}
+
+const generateEntryPoint = (className: string): HTMLDivElement => {
+	const selectorContainer = document.createElement("div");
+	selectorContainer.classList.add(className);
+	return selectorContainer;
 }

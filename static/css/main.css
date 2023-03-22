@@ -79,6 +79,8 @@ body {
 .player-card__header img {
   margin-bottom: -5px;
   max-width: 200px;
+  min-height: 150px;
+  max-height: 150px;
 }
 .player-card__details {
   position: relative;
