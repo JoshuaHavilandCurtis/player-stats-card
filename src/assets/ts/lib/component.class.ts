@@ -1,18 +1,18 @@
 export default abstract class Component {
-	contentEntryPoint: HTMLElement;
+	node: HTMLElement;
 	appended = false;
 
 	constructor(
-		public entryPoint: HTMLElement
+		public entryNode: HTMLElement
 	) {
-		this.contentEntryPoint = document.createElement("div");
-		this.contentEntryPoint.classList.add("component");
+		this.node = document.createElement("div");
+		this.node.classList.add("component");
 	}
 
 	replaceHtml(html: string) {
-		this.contentEntryPoint.innerHTML = html;
+		this.node.innerHTML = html;
 		if (!this.appended) {
-			this.entryPoint.appendChild(this.contentEntryPoint);
+			this.entryNode.appendChild(this.node);
 			this.appended = true;
 		}
 	}
@@ -20,7 +20,7 @@ export default abstract class Component {
 	render(..._params: any) { } //TODO ---> look up how to fix this
 
 	unrender() { //TODO ---> remove event listeners?
-		this.entryPoint.removeChild(this.contentEntryPoint);
+		this.entryNode.removeChild(this.node);
 		this.appended = false;
 	}
 }

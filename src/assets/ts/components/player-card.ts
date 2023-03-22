@@ -5,10 +5,10 @@ import { CustomSelector } from "./common/custom-selectors";
 import { LoaderComponent } from "./common/loader.component";
 
 export default () => {
-	const entryPoint = document.getElementById("player-card-entrypoint");
-	if (entryPoint === null) throw new Error("Failed to find player card entry point!");
+	const entryNode = document.getElementById("player-card-entry-node");
+	if (entryNode === null) throw new Error("Failed to find player card entry point!");
 
-	handlePlayerCard(entryPoint);
+	handlePlayerCard(entryNode);
 }
 
 
@@ -19,10 +19,10 @@ export default () => {
  * - Render components using this player data
  */
 
-const handlePlayerCard = async (entryPoint: HTMLElement) => {
+const handlePlayerCard = async (entryNode: HTMLElement) => {
 	//define components
-	const loader = new LoaderComponent(entryPoint);
-	const playerCardContainer = new PlayerCardContainer(entryPoint);
+	const loader = new LoaderComponent(entryNode);
+	const playerCardContainer = new PlayerCardContainer(entryNode);
 
 	//render the loader
 	loader.render();
@@ -61,14 +61,16 @@ const getPlayerData = async (): Promise<PlayerData> => {
 
 class PlayerCardContainer extends Component {
 	playerCardSelector: PlayerCardSelector | null = null;
+	playerCard: PlayerCard | null = null;
 
 	render(props: { playerCardSelector: { players: Player[] } }) {
 		this.replaceHtml(`<div class="player-card-container"></div>`);
 
-		const container = this.contentEntryPoint.querySelector<HTMLElement>(".player-card-container");
+		const container = this.node.querySelector<HTMLElement>(".player-card-container");
 		if (container === null) throw new Error("Failed to find generated player card container!");
 
-		this.playerCardSelector = new PlayerCardSelector(container);
+		this.playerCard = new PlayerCard(container);
+		this.playerCardSelector = new PlayerCardSelector(container, this.playerCard);
 		this.playerCardSelector.render(props.playerCardSelector);
 	}
 }
@@ -79,7 +81,12 @@ class PlayerCardContainer extends Component {
  */
 
 class PlayerCardSelector extends Component {
-	playerCard = new PlayerCard(this.entryPoint);
+	constructor(
+		entryNode: HTMLElement,
+		public playerCard: PlayerCard
+	) {
+		super(entryNode);
+	}
 
 	render(props: { players: Player[] }) {
 		this.replaceHtml(`
@@ -90,7 +97,7 @@ class PlayerCardSelector extends Component {
 			</div>
 		`);
 
-		const selector = this.contentEntryPoint.querySelector<HTMLSelectElement>(".selector");
+		const selector = this.node.querySelector<HTMLSelectElement>(".selector");
 		if (selector === null) throw new Error("Failed to find generated selector element!");
 
 		//whenever selector changes, render the newly selected player
