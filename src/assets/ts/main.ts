@@ -1,6 +1,11 @@
-import selector from "./components/selector";
-import domLoaded from "./lib/dom-loaded";
+import customSelectors from "./components/common/custom-selectors";
+import playerCard from "./components/player-card";
+import waitForDOM from "./lib/waitForDOM";
 
-domLoaded().then(() => {
-	selector();
+waitForDOM().then(() => {
+	//common
+	customSelectors();
+
+	//non-reusable
+	playerCard();
 });

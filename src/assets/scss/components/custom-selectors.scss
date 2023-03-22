@@ -3,9 +3,10 @@
 	display: flex;
 	justify-content: flex-start;
 
-	&.visible {
+	&.opened {
 		.options {
 			pointer-events: unset;
+			transform: translateY(0);
 			opacity: 1;
 		}
 	}
@@ -14,7 +15,7 @@
 		display: none !important;
 	}
 
-	.selected {
+	.selected-option {
 		display: flex;
 		padding: 0.75rem 1.5rem;
 		background-color: #eaeaea;
@@ -34,12 +35,18 @@
 		background-color: #eaeaea;
 		pointer-events: none;
 		opacity: 0;
-		transition: opacity 150ms ease-in-out;
+		transform: translateY(-1rem);
+		transition: opacity var(--anim), transform var(--anim);
 
 		.option {
 			padding: 0.75rem 1.5rem;
 			cursor: pointer;
-			transition: background-color 75ms ease-in-out;
+			transition: background-color var(--anim);
+
+			// to keep the selected item in the list visible, remove this
+			&.selected {
+				display: none;
+			}
 
 			&:hover {
 				background-color: whitesmoke;

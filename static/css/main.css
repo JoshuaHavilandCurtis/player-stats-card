@@ -1,0 +1,125 @@
+/*!****************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./src/assets/scss/main.scss ***!
+  \****************************************************************************************************************************************************************************/
+:root {
+  --anim: 75ms ease-in-out;
+}
+
+body {
+  font-family: Arial;
+  background-color: firebrick;
+}
+
+.selector {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+}
+.selector.opened .options {
+  pointer-events: unset;
+  transform: translateY(0);
+  opacity: 1;
+}
+.selector select {
+  display: none !important;
+}
+.selector .selected-option {
+  display: flex;
+  padding: 0.75rem 1.5rem;
+  background-color: #eaeaea;
+  cursor: pointer;
+  width: 100%;
+}
+.selector .options {
+  position: absolute;
+  top: 100%;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background-color: #eaeaea;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-1rem);
+  transition: opacity var(--anim), transform var(--anim);
+}
+.selector .options .option {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color var(--anim);
+}
+.selector .options .option.selected {
+  display: none;
+}
+.selector .options .option:hover {
+  background-color: whitesmoke;
+}
+
+.player-card {
+  max-width: 300px;
+  margin: 0 auto;
+}
+.player-card__selector {
+  padding: 1rem;
+  background-color: white;
+}
+.player-card__header {
+  background-color: white;
+  padding: 0 1rem;
+}
+.player-card__header img {
+  margin-bottom: -5px;
+  max-width: 100%;
+}
+.player-card__details {
+  position: relative;
+  background-color: #e90052;
+  padding: 1rem;
+}
+.player-card__details .player-card__image {
+  width: 82px;
+  height: 82px;
+  display: block;
+  background: green;
+  position: absolute;
+  top: -2rem;
+  right: 1rem;
+  border-radius: 100%;
+}
+.player-card__details .player-card-headings {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 5.3rem;
+}
+.player-card__details .player-card-headings .player-card__heading,
+.player-card__details .player-card-headings .player-card__subtitle {
+  margin: 0;
+  color: white;
+}
+.player-card__details .player-card-headings .player-card__heading {
+  font-size: 1.25rem;
+}
+.player-card__details .player-card-headings .player-card__subtitle {
+  font-size: 1rem;
+}
+.player-card__details .player-card__table {
+  margin: 0;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 1rem;
+}
+.player-card__details .player-card__table li {
+  background-color: white;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+.player-card__details .player-card__table li span {
+  font-weight: bold;
+}

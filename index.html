@@ -6,48 +6,19 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Player Stats Card</title>
-	<script src="dist/js/main.min.js"></script>
-	<script src="dist/js/runtime.min.js"></script>
-	<link rel="stylesheet" href="dist/css/main.min.css">
+	<script src="/static/js/main.js"></script>
+	<script src="/static/js/runtime.js"></script>
+	<link href="/static/css/main.css" rel="stylesheet">
 </head>
 
 <body>
-
 	<main>
-		<div class="player-card">
-			<div class="player-card__selector">
-				<div class="selector" data-selector>
-					<select id="temp">
-						<option selected value="player-1">Select a player</option>
-						<option value="player-2">Larry</option>
-						<option value="player-3">Simone</option>
-					</select>
-				</div>
-			</div>
 
-			<div class="player-card__header">
-				<img src="dist/img/p2064.png">
-			</div>
+		<!-- <div id="player-card-entry"> -->
 
-			<div class="player-card__details">
-				<div class="player-card__image"></div>
-
-				<div class="player-card-headings">
-					<h1 class="player-card__heading">Toby Alderweireld</h1>
-					<h2 class="player-card__subtitle">Defender</h2>
-				</div>
-
-				<ul class="player-card__table">
-					<li>Appearances <span>80</span></li>
-					<li>Goals <span>5</span></li>
-					<li>Assists <span>2</span></li>
-					<li>Goals per match <span>0.06</span></li>
-					<li>Passes per minute <span>0.26</span></li>
-				</ul>
-			</div>
-		</div>
+		<select id="player-selector" class="player-card-selector selector" data-custom-selector></select>
+		<div id="player-card" class="player-card"></div>
 	</main>
-
 </body>
 
 </html>

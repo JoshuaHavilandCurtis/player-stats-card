@@ -14,7 +14,7 @@ const env = {
 const paths = {
 	src: path.join(__dirname, "src"),
 	src_assets: path.join(__dirname, "src", "assets"),
-	dist: path.join(__dirname, "dist")
+	dist: path.join(__dirname, "static")
 }
 
 export default (): Configuration => {
@@ -26,14 +26,14 @@ export default (): Configuration => {
 		mode: env.mode === "production" ? "production" : "development",
 		entry: [path.join(paths.src_assets, "ts", "main.ts"), path.join(paths.src_assets, "scss", "main.scss")],
 		output: {
-			filename: path.join("js", "[name].min.js"),
+			filename: path.join("js", "[name].js"),
 			path: paths.dist,
 			clean: true
 		},
 		plugins: [
 			new MiniCssExtractPlugin({
-				filename: "css/[name].min.css",
-				chunkFilename: "css/[id].min.css",
+				filename: "css/[name].css",
+				chunkFilename: "css/[id].css",
 			}),
 			new CopyWebpackPlugin({
 				patterns: [
