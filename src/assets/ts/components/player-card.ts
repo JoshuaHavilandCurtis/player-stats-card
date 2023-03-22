@@ -22,7 +22,7 @@ export default () => {
 const handlePlayerCard = async (entryPoint: HTMLElement) => {
 	//define components
 	const loader = new LoaderComponent(entryPoint);
-	const playerCardContainer = new PlayerCardContainerComponent(entryPoint);
+	const playerCardContainer = new PlayerCardContainer(entryPoint);
 
 	//render the loader
 	loader.render();
@@ -59,8 +59,8 @@ const getPlayerData = async (): Promise<PlayerData> => {
  * A container component for the card selector component, and for the card component
  */
 
-class PlayerCardContainerComponent extends Component {
-	playerCardSelector: PlayerCardSelectorComponent | null = null;
+class PlayerCardContainer extends Component {
+	playerCardSelector: PlayerCardSelector | null = null;
 
 	render(props: { playerCardSelector: { players: Player[] } }) {
 		this.replaceHtml(`<div class="player-card-container"></div>`);
@@ -68,7 +68,7 @@ class PlayerCardContainerComponent extends Component {
 		const container = this.contentEntryPoint.querySelector<HTMLElement>(".player-card-container");
 		if (container === null) throw new Error("Failed to find generated player card container!");
 
-		this.playerCardSelector = new PlayerCardSelectorComponent(container);
+		this.playerCardSelector = new PlayerCardSelector(container);
 		this.playerCardSelector.render(props.playerCardSelector);
 	}
 }
@@ -78,8 +78,8 @@ class PlayerCardContainerComponent extends Component {
  * rendered when the value changes
  */
 
-class PlayerCardSelectorComponent extends Component {
-	playerCard = new PlayerCardComponent(this.entryPoint);
+class PlayerCardSelector extends Component {
+	playerCard = new PlayerCard(this.entryPoint);
 
 	render(props: { players: Player[] }) {
 		this.replaceHtml(`
@@ -116,10 +116,9 @@ class PlayerCardSelectorComponent extends Component {
  * A card that contains information about a player
  */
 
-class PlayerCardComponent extends Component {
+class PlayerCard extends Component {
 	render(props: { player: Player }) {
 		const getStat = (statName: PlayerStatisticName) => props.player.stats.find(stat => stat.name === statName)?.value ?? null;
-		const renderStat = (stat: number | string | null) => stat === null ? "Unknown" : stat;
 
 		//read / calculate stats
 		const goals = getStat("goals");
@@ -130,6 +129,8 @@ class PlayerCardComponent extends Component {
 		const backwardPasses = getStat("backward_pass");
 		const minsPlayed = getStat("mins_played");
 		const passesPerMinute = fwdPasses === null || backwardPasses === null || minsPlayed === null ? null : ((fwdPasses + backwardPasses) / minsPlayed).toFixed(2);
+
+		const renderStat = (label: string, stat: string | number | null) => stat !== null ? `<li>${label} <span>${stat}</span></li>` : null;
 
 		this.replaceHtml(`
 			<div class="player-card">
@@ -143,11 +144,11 @@ class PlayerCardComponent extends Component {
 						<h2 class="player-card__subtitle">${props.player.player.info.positionInfo}</h2>
 					</div>
 					<ul class="player-card__table">
-						<li>Appearances <span>${renderStat(appearances)}</span></li>
-						<li>Goals <span>${renderStat(goals)}</span></li>
-						<li>Assists <span>${renderStat(assists)}</span></li>
-						<li>Goals per match <span>${renderStat(goalsPerMatch)}</span></li>
-						<li>Passes per minute <span>${renderStat(passesPerMinute)}</span></li>
+						${renderStat("Appearances", appearances) ?? ""}
+						${renderStat("Goals", goals) ?? ""}
+						${renderStat("Assists", assists) ?? ""}
+						${renderStat("Goals", goalsPerMatch) ?? ""}
+						${renderStat("Passes per minute", passesPerMinute) ?? ""}
 					</ul>
 				</div>
 			</div>

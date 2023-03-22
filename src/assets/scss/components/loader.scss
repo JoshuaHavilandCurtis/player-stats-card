@@ -29,15 +29,15 @@
 	border-bottom: 5px solid white;
 	border-left: 10px solid var(--pink);
 
-	animation: Load 750ms linear infinite;
+	animation: Load 750ms ease-in-out infinite;
 
 	@keyframes Load {
 		0% {
-			transform: rotate(0);
+			transform: rotate(45deg);
 		}
 
 		100% {
-			transform: rotate(360deg);
+			transform: rotate(405deg);
 		}
 	}
 }
