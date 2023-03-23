@@ -1,4 +1,4 @@
-# player-stats-card
+# Player Stats Card - Pulselive, London
 
 JavaScript ES6, TypeScript, HTML5, SCSS and Webpack
 
