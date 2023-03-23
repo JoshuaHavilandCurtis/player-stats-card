@@ -1,6 +1,6 @@
 # Player Stats Card - Pulselive, London
 
-JavaScript ES6, TypeScript, HTML5, SCSS and Webpack
+JavaScript ES6, TypeScript, HTML5, SCSS and Webpack. I did build a mixin for the sprite, choosing by row and column 100px by 100px but not finished!
 
 #### npm run dev
 #### npm start 
